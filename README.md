@@ -1,3 +1,3 @@
 #### About
 
-[https://github.com/AZHenley/teenytinycompiler](teenytinycompiler) ported to JavaScript
+[teenytinycompiler](https://github.com/AZHenley/teenytinycompiler) ported to JavaScript
