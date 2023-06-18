@@ -25,7 +25,9 @@ p.prototype.checkPeek = function (kind) {
 
 p.prototype.match = function (kind) {
   if (!this.checkToken(kind)) {
-    this.abort(`Expected ${kind.name}, got ${this.curToken.kind.name}`);
+    this.abort(
+      `Expected ${kind.description}, got ${this.curToken.kind.description}`
+    );
   }
   this.nextToken();
 };
@@ -36,11 +38,16 @@ p.prototype.nextToken = function (kind) {
 };
 
 p.prototype.abort = function (message) {
-  //
+  console.error(`Error. ${message}`);
+  process.exit(1);
 };
 
 p.prototype.program = function () {
   console.log("PROGRAM");
+
+  while (!this.checkToken(TokenType.NEWLINE)) {
+    this.nextToken();
+  }
 
   while (!this.checkToken(TokenType.EOF)) {
     this.statement();
@@ -57,9 +64,63 @@ p.prototype.statement = function () {
     } else {
       this.expression();
     }
+  } else if (this.checkToken(TokenType.IF)) {
+    console.log("STATEMENT-IF");
 
+    this.nextToken();
+    this.comparison();
+
+    this.match(TokenType.THEN);
     this.nl();
+
+    while (!this.checkToken(TokenType.ENDIF)) {
+      this.statement();
+    }
+
+    this.match(TokenType.ENDIF);
+  } else if (this.checkToken(TokenType.WHILE)) {
+    console.log("STATEMENT-WHILE");
+
+    this.nextToken();
+    this.comparison();
+
+    this.match(TokenType.REPEAT);
+    This.nl();
+
+    while (!this.checkToken(TokenType.ENDWHILE)) {
+      this.statement();
+    }
+
+    this.match(TokenType.ENDWHILE);
+  } else if (this.checkToken(TokenType.LABEL)) {
+    console.log("STATEMENT-LABEL");
+
+    this.nextToken();
+    this.match(TokenType.IDENT);
+  } else if (this.checkToken(TokenType.GOTO)) {
+    console.log("STATEMENT-GOTO");
+
+    this.nextToken();
+    this.match(TokenType.IDENT);
+  } else if (this.checkToken(TokenType.LET)) {
+    console.log("STATEMENT-LET");
+
+    this.nextToken();
+    this.match(TokenType.IDENT);
+    this.match(TokenType.EQ);
+    this.expression();
+  } else if (this.checkToken(TokenType.INPUT)) {
+    console.log("STATEMENT-INPUT");
+
+    this.nextToken();
+    this.match(TokenType.IDENT);
+  } else {
+    this.abort(
+      `Invalid statement at ${this.curToken.text} ( ${this.curToken.kind.description} )`
+    );
   }
+
+  this.nl();
 };
 
 p.prototype.nl = function () {
