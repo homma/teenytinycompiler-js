@@ -96,7 +96,7 @@ l.prototype.getToken = function () {
     }
   } else if (this.curChar == '"') {
     this.nextChar();
-    startPos = this.curPos;
+    const startPos = this.curPos;
 
     while (this.curChar != '"') {
       if (
