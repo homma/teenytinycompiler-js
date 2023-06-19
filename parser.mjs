@@ -8,6 +8,10 @@ class Parser {
   constructor(lexer) {
     this.lexer = lexer;
 
+    this.symbols = new Set();
+    this.labelsDeclared = new Set();
+    this.labelsGotoed = new Set();
+
     this.nextToken();
     this.nextToken();
   }
@@ -51,6 +55,12 @@ p.prototype.program = function () {
 
   while (!this.checkToken(TokenType.EOF)) {
     this.statement();
+  }
+
+  for (let label of this.labelsGotoed) {
+    if (!this.labelsDeclared.has(label)) {
+      this.abort(`Attempting to GOTO to undeclared label: ${label}`);
+    }
   }
 };
 
@@ -96,16 +106,28 @@ p.prototype.statement = function () {
     console.log("STATEMENT-LABEL");
 
     this.nextToken();
+
+    if (this.labelsDeclared.has(this.curToken.text)) {
+      this.abort(`Label already exists; ${this.curToken.text}`);
+    }
+    this.labelsDeclared.add(this.curToken.text);
+
     this.match(TokenType.IDENT);
   } else if (this.checkToken(TokenType.GOTO)) {
     console.log("STATEMENT-GOTO");
 
     this.nextToken();
+    this.labelsGotoed.add(this.curToken.text);
     this.match(TokenType.IDENT);
   } else if (this.checkToken(TokenType.LET)) {
     console.log("STATEMENT-LET");
 
     this.nextToken();
+
+    if (!this.symbols.has(this.curToken.text)) {
+      this.symbols.add(this.curToken.text);
+    }
+
     this.match(TokenType.IDENT);
     this.match(TokenType.EQ);
     this.expression();
@@ -113,6 +135,11 @@ p.prototype.statement = function () {
     console.log("STATEMENT-INPUT");
 
     this.nextToken();
+
+    if (!this.symbols.has(this.curToken.text)) {
+      this.symbols.add(this.curToken.text);
+    }
+
     this.match(TokenType.IDENT);
   } else {
     this.abort(
@@ -202,6 +229,11 @@ p.prototype.primary = function () {
   if (this.checkToken(TokenType.NUMBER)) {
     this.nextToken();
   } else if (this.checkToken(TokenType.IDENT)) {
+    if (!this.symbols.has(this.curToken.text)) {
+      this.abort(
+        `Referencing variable before assignments: ${this.curToken.text}`
+      );
+    }
     this.nextToken();
   } else {
     this.abort(`Unexpected token at ${this.curToken.text}`);
