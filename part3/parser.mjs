@@ -77,34 +77,40 @@ p.prototype.statement = function () {
       this.emitter.emitLine(`printf("${this.curToken.text}\\n");`);
       this.nextToken();
     } else {
-      this.emitter.emit(`printf("%.2f\\n", (float(`);
+      this.emitter.emit(`printf("%.2f\\n", (float)(`);
       this.expression();
       this.emitter.emitLine("));");
     }
   } else if (this.checkToken(TokenType.IF)) {
     this.nextToken();
+    this.emitter.emit("if(");
     this.comparison();
 
     this.match(TokenType.THEN);
     this.nl();
+    this.emitter.emitLine("){");
 
     while (!this.checkToken(TokenType.ENDIF)) {
       this.statement();
     }
 
     this.match(TokenType.ENDIF);
+    this.emitter.emitLine("}");
   } else if (this.checkToken(TokenType.WHILE)) {
     this.nextToken();
+    this.emitter.emit("while(");
     this.comparison();
 
     this.match(TokenType.REPEAT);
     this.nl();
+    this.emitter.emitLine("){");
 
     while (!this.checkToken(TokenType.ENDWHILE)) {
       this.statement();
     }
 
     this.match(TokenType.ENDWHILE);
+    this.emitter.emitLine("}");
   } else if (this.checkToken(TokenType.LABEL)) {
     this.nextToken();
 
@@ -113,28 +119,39 @@ p.prototype.statement = function () {
     }
     this.labelsDeclared.add(this.curToken.text);
 
+    this.emitter.emitLine(`${this.curToken.text}:`);
     this.match(TokenType.IDENT);
   } else if (this.checkToken(TokenType.GOTO)) {
     this.nextToken();
     this.labelsGotoed.add(this.curToken.text);
+    this.emitter.emitLine(`goto ${this.curToken.text};`);
     this.match(TokenType.IDENT);
   } else if (this.checkToken(TokenType.LET)) {
     this.nextToken();
 
     if (!this.symbols.has(this.curToken.text)) {
       this.symbols.add(this.curToken.text);
+      this.emitter.headerLine(`float ${this.curToken.text};`);
     }
 
+    this.emitter.emit(`${this.curToken.text} = `);
     this.match(TokenType.IDENT);
     this.match(TokenType.EQ);
     this.expression();
+    this.emitter.emitLine(";");
   } else if (this.checkToken(TokenType.INPUT)) {
     this.nextToken();
 
     if (!this.symbols.has(this.curToken.text)) {
       this.symbols.add(this.curToken.text);
+      this.emitter.headerLine(`float ${this.curToken.text};`);
     }
 
+    this.emitter.emitLine(`if(0 == scanf("%f", &${this.curToken.text})) {`);
+    this.emitter.emitLine(`${this.curToken.text} = 0;`);
+    this.emitter.emit(`scanf("%`);
+    this.emitter.emitLine(`*s");`);
+    this.emitter.emitLine("}");
     this.match(TokenType.IDENT);
   } else {
     this.abort(
