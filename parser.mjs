@@ -45,7 +45,7 @@ p.prototype.abort = function (message) {
 p.prototype.program = function () {
   console.log("PROGRAM");
 
-  while (!this.checkToken(TokenType.NEWLINE)) {
+  while (this.checkToken(TokenType.NEWLINE)) {
     this.nextToken();
   }
 
@@ -85,7 +85,7 @@ p.prototype.statement = function () {
     this.comparison();
 
     this.match(TokenType.REPEAT);
-    This.nl();
+    this.nl();
 
     while (!this.checkToken(TokenType.ENDWHILE)) {
       this.statement();
@@ -129,5 +129,81 @@ p.prototype.nl = function () {
   this.match(TokenType.NEWLINE);
   while (this.checkToken(TokenType.NEWLINE)) {
     this.nextToken();
+  }
+};
+
+p.prototype.comparison = function () {
+  console.log("COMPARISON");
+
+  this.expression();
+
+  if (this.isComparisonOperator()) {
+    this.nextToken();
+    this.expression();
+  } else {
+    this.abort(`Expected comparison operator at: ${this.curToken.text}`);
+  }
+
+  while (this.isComparisonOperator()) {
+    this.nextToken();
+    this.expression();
+  }
+};
+
+p.prototype.isComparisonOperator = function () {
+  return (
+    this.checkToken(TokenType.GT) ||
+    this.checkToken(TokenType.GTEQ) ||
+    this.checkToken(TokenType.LT) ||
+    this.checkToken(TokenType.LTEQ) ||
+    this.checkToken(TokenType.EQEQ) ||
+    this.checkToken(TokenType.NOTEQ)
+  );
+};
+
+p.prototype.expression = function () {
+  console.log("EXPRESSION");
+
+  this.term();
+
+  while (this.checkToken(TokenType.PLUS) || this.checkToken(TokenType.MINUS)) {
+    this.nextToken();
+    this.term();
+  }
+};
+
+p.prototype.term = function () {
+  console.log("TERM");
+
+  this.unary();
+
+  while (
+    this.checkToken(TokenType.ASTERISK) ||
+    this.checkToken(TokenType.SLASH)
+  ) {
+    this.nextToken();
+    this.unary();
+  }
+};
+
+p.prototype.unary = function () {
+  console.log("UNARY");
+
+  if (this.checkToken(TokenType.PLUS) || this.checkToken(TokenType.MINUS)) {
+    this.nextToken();
+  }
+
+  this.primary();
+};
+
+p.prototype.primary = function () {
+  console.log(`PRIMARY (${this.curToken.text})`);
+
+  if (this.checkToken(TokenType.NUMBER)) {
+    this.nextToken();
+  } else if (this.checkToken(TokenType.IDENT)) {
+    this.nextToken();
+  } else {
+    this.abort(`Unexpected token at ${this.curToken.text}`);
   }
 };
