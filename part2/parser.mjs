@@ -1,5 +1,5 @@
-import { Lexer, TokenType } from "./lexer.mjs";
 export { Parser };
+import { TokenType } from "./lexer.mjs";
 
 class Parser {
   curToken = null;

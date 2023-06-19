@@ -1,5 +1,5 @@
-import { Lexer, TokenType } from "./lexer.mjs";
 export { Parser };
+import { TokenType } from "./lexer.mjs";
 
 class Parser {
   curToken = null;
@@ -77,7 +77,7 @@ p.prototype.statement = function () {
       this.emitter.emitLine(`printf("${this.curToken.text}\\n");`);
       this.nextToken();
     } else {
-      this.emitter.emit(`printf("%.2f\\n", (float)(`);
+      this.emitter.emit('printf("%.2f\\n", (float)(');
       this.expression();
       this.emitter.emitLine("));");
     }
@@ -149,8 +149,8 @@ p.prototype.statement = function () {
 
     this.emitter.emitLine(`if(0 == scanf("%f", &${this.curToken.text})) {`);
     this.emitter.emitLine(`${this.curToken.text} = 0;`);
-    this.emitter.emit(`scanf("%`);
-    this.emitter.emitLine(`*s");`);
+    this.emitter.emit('scanf("%');
+    this.emitter.emitLine('*s");');
     this.emitter.emitLine("}");
     this.match(TokenType.IDENT);
   } else {
