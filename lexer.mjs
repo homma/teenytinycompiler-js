@@ -109,10 +109,10 @@ l.prototype.getToken = function () {
         this.abort("Illegal character in string.");
       }
       this.nextChar();
-
-      const tokText = this.source.substring(startPos, this.curPos);
-      token = new Token(tokText, TokenType.STRING);
     }
+
+    const tokText = this.source.substring(startPos, this.curPos);
+    token = new Token(tokText, TokenType.STRING);
   } else if (isDigit(this.curChar)) {
     const startPos = this.curPos;
     while (isDigit(this.peek())) {
