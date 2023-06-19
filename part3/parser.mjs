@@ -173,6 +173,7 @@ p.prototype.comparison = function () {
   this.expression();
 
   if (this.isComparisonOperator()) {
+    this.emitter.emit(this.curToken.text);
     this.nextToken();
     this.expression();
   } else {
@@ -180,6 +181,7 @@ p.prototype.comparison = function () {
   }
 
   while (this.isComparisonOperator()) {
+    this.emitter.emit(this.curToken.text);
     this.nextToken();
     this.expression();
   }
@@ -200,6 +202,7 @@ p.prototype.expression = function () {
   this.term();
 
   while (this.checkToken(TokenType.PLUS) || this.checkToken(TokenType.MINUS)) {
+    this.emitter.emit(this.curToken.text);
     this.nextToken();
     this.term();
   }
@@ -212,6 +215,7 @@ p.prototype.term = function () {
     this.checkToken(TokenType.ASTERISK) ||
     this.checkToken(TokenType.SLASH)
   ) {
+    this.emitter.emit(this.curToken.text);
     this.nextToken();
     this.unary();
   }
@@ -219,6 +223,7 @@ p.prototype.term = function () {
 
 p.prototype.unary = function () {
   if (this.checkToken(TokenType.PLUS) || this.checkToken(TokenType.MINUS)) {
+    this.emitter.emit(this.curToken.text);
     this.nextToken();
   }
 
@@ -227,6 +232,7 @@ p.prototype.unary = function () {
 
 p.prototype.primary = function () {
   if (this.checkToken(TokenType.NUMBER)) {
+    this.emitter.emit(this.curToken.text);
     this.nextToken();
   } else if (this.checkToken(TokenType.IDENT)) {
     if (!this.symbols.has(this.curToken.text)) {
@@ -234,6 +240,7 @@ p.prototype.primary = function () {
         `Referencing variable before assignments: ${this.curToken.text}`
       );
     }
+    this.emitter.emit(this.curToken.text);
     this.nextToken();
   } else {
     this.abort(`Unexpected token at ${this.curToken.text}`);
