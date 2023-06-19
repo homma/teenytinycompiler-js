@@ -26,5 +26,5 @@ e.prototype.headerLine = function (code) {
 
 e.prototype.writeFile = function () {
   const fd = fs.openSync(this.fullPath, "w");
-  fs.writeSync(fd, `${this.header} ${this.code}`, null, { encoding: "utf8" });
+  fs.writeSync(fd, `${this.header}${this.code}`, null, { encoding: "utf8" });
 };

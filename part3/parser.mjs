@@ -74,9 +74,12 @@ p.prototype.statement = function () {
     this.nextToken();
 
     if (this.checkToken(TokenType.STRING)) {
+      this.emitter.emitLine(`printf("${this.curToken.text}\\n");`);
       this.nextToken();
     } else {
+      this.emitter.emit(`printf("%.2f\\n", (float(`);
       this.expression();
+      this.emitter.emitLine("));");
     }
   } else if (this.checkToken(TokenType.IF)) {
     this.nextToken();
