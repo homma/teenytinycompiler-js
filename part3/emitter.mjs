@@ -1,5 +1,5 @@
-import fs from "fs";
 export { Emitter };
+import fs from "fs";
 
 class Emitter {
   header = "";
